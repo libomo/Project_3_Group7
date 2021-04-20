@@ -12,20 +12,25 @@ import org.apache.log4j.{Level, Logger}
 
 /*
               Testing verifyMIS
-spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify ../project_3_data/small_edges.csv ../project_3_data/small_edges_MIS.csv
-spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify ../project_3_data/small_edges.csv ../project_3_data/small_edges_non_MIS.csv
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify project_3_data/small_edges.csv project_3_data/small_edges_MIS.csv
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify project_3_data/small_edges.csv project_3_data/small_edges_non_MIS.csv
+
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify project_3_data/line_100_edges.csv project_3_data/line_100_MIS_test_1.csv
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify project_3_data/line_100_edges.csv project_3_data/line_100_MIS_test_2.csv
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify project_3_data/twitter_10000_edges.csv project_3_data/twitter_10000_MIS_test_1.csv
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify project_3_data/twitter_10000_edges.csv project_3_data/twitter_10000_MIS_test_2.csv
 
               Testing small_edges.csv
-spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar compute ../project_3_data/small_edges.csv ourResults/our_small_edges_MIS
-spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify ../project_3_data/small_edges.csv ourResults/our_small_edges_MIS/aaa.csv
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar compute project_3_data/small_edges.csv ourResults/our_small_edges_MIS
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify project_3_data/small_edges.csv ourResults/our_small_edges_MIS/aaa.csv
 
               Testing line_100_edges.csv
-spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar compute ../project_3_data/line_100_edges.csv ourResults/our_line_100_edges_MIS
-spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify ../project_3_data/small_edges.csv ourResults/our_line_100_edges_MIS/aaa.csv
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar compute project_3_data/line_100_edges.csv ourResults/our_line_100_edges_MIS
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify project_3_data/small_edges.csv ourResults/our_line_100_edges_MIS/aaa.csv
 
               Testing twitter_10000_edges.csv
-spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar compute ../project_3_data/twitter_10000_edges.csv ourResults/our_twitter_10000_edges_MIS
-spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify ../project_3_data/small_edges.csv ourResults/our_twitter_10000_edges_MIS/aaa.csv
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar compute project_3_data/twitter_10000_edges.csv ourResults/our_twitter_10000_edges_MIS
+spark-submit --class "project_3.main" --master "local[*]" target/scala-2.12/project_3_2.12-1.0.jar verify project_3_data/small_edges.csv ourResults/our_twitter_10000_edges_MIS/aaa.csv
 
 
 Results are all good so far !!!
@@ -69,6 +74,9 @@ object main{
       g = Graph(v2, g.edges)
       g.cache()
       remaining_vertices = g.vertices.filter({case (id, x) => (x._1 == 0)} ).count()
+      println("************************************************************")
+      println("Current Iteration = " + iteration + ". Remaining vertices = " + remaining_vertices)
+      println("************************************************************")
     }
     println("************************************************************")
     println("Total number of Iteration = " + iteration)
@@ -78,10 +86,6 @@ object main{
 
 
   def verifyMIS(g_in: Graph[Int, Int]): Boolean = {
-    // To Implement
-    // def msgFun(triplet: EdgeContext[Int, Int, Int]) {
-    //   triplet.sendToDst("Hi")}
-    // {e.sendToSrc(1,e.dstAttr); e.sendToDst(1,e.srcAttr)}, reduceFun
 
     val my = g_in.aggregateMessages[Int](
       e => {
@@ -95,26 +99,7 @@ object main{
 
     return count2 == 0 && count_1 == 0
 
-    // val edges = g_in.edges
-    // val count = edges.map(e => {if(e.dstAttr == 1 && e.srcAttr == 1) false else true}).filter(x => x == false).count()
-    // if (count > 0) return false
-
-
-    // def reduceFun(a: (Int, Int), b: (Int,Int)) : (Int, Int) = (a._1 + b._1, a._2 + b._2)
-    // val ret = g_in.aggregateMessages[(Int, Int)](e => 
-    // if(e.dstAttr == -1) e.sendToDst(1,e.scrAttr)
-    // else if (e.dstAttr == 1) e.sendToDst(0,0) 
-    // else if (e.srcAttr == -1) e.sendToSrc(1,e.dstAttr) 
-    // else if (e.srcAttr == 1) e.sendToSrc(0,0), reduceFun _)
-    
-    // val ans = ret.filter(x => x._2._1 != 0).map(x => if(x._2._1 == x._2._2*-1) false else true).filter(x=> x == false).count()
-    // return ans==0
   }
-
-
-
-
-
 
   def main(args: Array[String]) {
 

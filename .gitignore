@@ -1,3 +1,7 @@
 project
 target
 .idea
+.metals
+.vscode
+project_3_data
+ourResults
